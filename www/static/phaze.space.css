@@ -1,0 +1,12 @@
+body {
+  background-color: #111111;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+a:active.pzbuttonhack, a:focus.pzbuttonhack, a:hover.pzbuttonhack {
+  text-decoration: none;
+  outline: 0;
+}
