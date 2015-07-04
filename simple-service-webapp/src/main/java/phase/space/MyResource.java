@@ -17,6 +17,7 @@ import java.sql.Statement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 
+import java.io.*;
 
 /**
  * Root resource (exposed at "myresource" path)
@@ -39,11 +40,22 @@ public class MyResource {
                 Connection c=ds.getConnection();
                 Statement st=c.createStatement();
                 ResultSet rs=st.executeQuery("select suburb,postcode from suburbs;");
+ 
 		String res=new String();
+
+		//Quick and dirty: add XML header
+		res="<?xml version=\"1.0\" standalone='yes'?>\n\n";
                 while(rs.next()){
                         String name=rs.getString(1);
                         String postcode=rs.getString(2);
-			res=res+name+" "+postcode+"\n";
+			Suburb tempSuburb = new Suburb(name, postcode);
+			res=res+"<suburb>\n";
+			res=res+"\t<name>"+tempSuburb.name+"</name>\n";
+			res=res+"\t<postcode>"+tempSuburb.postcode+"</postcode>\n";
+			res=res+"</suburb>\n";
+			//'res' is a string. Should be using Append? 
+			// syntax below is wrong
+			//res.append(tempSuburb.name);
                 }
 
                 rs.close();
