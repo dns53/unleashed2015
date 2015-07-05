@@ -32,7 +32,9 @@ Returns a series of questions and a reference to a specific view that is to be u
 
 Example result:
 ```
-<question category="Education" higher="lower" id="4">Who has the most amount of HECS debt still owing?</question><question category="Education" higher="lower" id="3">Who has the most people with a HECS debt?</question><question category="Education" higher="higher" id="5">Who has the most public shools nearby?</question>
+<question category="Education" higher="lower" id="4">Who has the most amount of HECS debt still owing?</question>
+<question category="Education" higher="lower" id="3">Who has the most people with a HECS debt?</question>
+<question category="Education" higher="higher" id="5">Who has the most public shools nearby?</question>
 ```
 
 ### API : answer
