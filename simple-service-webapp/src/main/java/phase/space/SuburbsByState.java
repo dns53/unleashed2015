@@ -43,41 +43,22 @@ public class SuburbsByState {
     public String getSuburbsByState(
 		@DefaultValue("SA") @QueryParam("state") String requestedState) throws Exception{
 		
-		int postcodeMin = 5000;
-		int postcodeMax = 5999;
+		requestedState.toUpperCase();
 
 		// This section connects to the database and executes the query
 		Context context = new InitialContext();
                 Context envCtx = (Context) context.lookup("java:comp/env");
                 DataSource   ds =  (DataSource)envCtx.lookup("jdbc/govhack");
                 Connection c=ds.getConnection();
-		
-		String query = "select suburb,postcode from suburbs";
-/*
-		// Run a query to get the postcode range for that state
-		String stateQuery = "select state,postcodeMin,postcodeMax from states where state = ? ;";
-		Statement st2=c.prepareStatement(stateQuery);
-		st2.setString(1,requestedState);
-		ResultSet rs2=st2.executeQuery(stateQuery);
-		
-		// TODO Add code in here to grab the postcode Min, and Max as variables
 
-		rs2.close();
-		st2.close();
-*/
+		PreparedStatement st = c.prepareStatement("select * from postcode_and_state where state like ?;");
 
-		// Here's where the data is returned
-		// Then use the returned range to refine the query
-		// This part is added down here for clarity when inserting the arguments
-		query += " where postcode in ( ?,?) ;";
-		
-                PreparedStatement st=c.prepareStatement(query);
-		st.setInt(1, postcodeMin);
-		st.setInt(2, postcodeMax);
-                ResultSet rs=st.executeQuery(query);
+		st.setString(1,requestedState);
+
+                ResultSet rs=st.executeQuery();
 
 		// This function assumes the standard format for a query on the Suburbs table
-		String result = suburbsToXML(rs);
+		String result = suburbsToXML(rs, requestedState);
 
                 rs.close();
                 st.close();
@@ -87,7 +68,7 @@ public class SuburbsByState {
        return result;
     }
 
-    protected String suburbsToXML(ResultSet rs){
+    protected String suburbsToXML(ResultSet rs, String state){
 
 	String res = "";	
 	//Creating an empty XML Document
@@ -102,6 +83,7 @@ public class SuburbsByState {
 		doc.appendChild(root);
 		
 		Element wrapper = doc.createElement("suburbs");
+		wrapper.setAttribute("state", state);
 		root.appendChild(wrapper);
 
 		while(rs.next()){
