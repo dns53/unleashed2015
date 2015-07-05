@@ -41,7 +41,8 @@ public class Question {
      * @return String that will be returned as a text/plain response.
      */
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
+    //@Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_XML)
     public String getIt() throws Exception{
 
 	 // This section connects to the database and executes the query
