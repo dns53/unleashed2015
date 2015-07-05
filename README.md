@@ -63,3 +63,14 @@ Well, this was a very short weekend hackathon!
 * a production system would create a data dictionary and data model
 * we didnt have time to code up a database or UX for sending feedback automatically to councils, etc
 * and so on...
+
+# A sneak peak at our teams efforts
+
+We used all available unleashed resources ... here we are pondering data insights using the wall of our space
+
+![questions](images/questionsvboard.jpg)
+
+And we did some early system engineering to ensure our concept made sense!
+
+![architecture](images/whiteboard.jpg)
+
