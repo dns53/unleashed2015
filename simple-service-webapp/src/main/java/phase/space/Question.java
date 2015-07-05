@@ -76,6 +76,7 @@ public class Question {
 			String higher=rs.getString(4);
 			//Add the suburbs to the XML file
            		Element q = doc.createElement("question");
+            		q.setAttribute("id",Integer.toString(id));
             		q.setAttribute("category",category);
 			if(higher.equalsIgnoreCase("H")){
             			q.setAttribute("higher", "higher");
