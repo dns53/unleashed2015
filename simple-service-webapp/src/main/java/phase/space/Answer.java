@@ -52,7 +52,7 @@ public class Answer {
                 Context envCtx = (Context) context.lookup("java:comp/env");
                 DataSource   ds =  (DataSource)envCtx.lookup("jdbc/govhack");
                 Connection c=ds.getConnection();
-                PreparedStatement st=c.prepareStatement("select question.id, category.name,question.question,question.higher from question,category where question.category=category.id and question.id=?;");
+                PreparedStatement st=c.prepareStatement("select question.id, category.name,question.question,question.higher,question.source from question,category where question.category=category.id and question.id=?;");
 		st.setInt(1,question_id);
 		ResultSet rs=st.executeQuery();
 
@@ -73,11 +73,13 @@ public class Answer {
 		//Quick and dirty: add XML header
 		//res="<?xml version=\"1.0\" standalone='yes'?>\n\n";
                 
-		while(rs.next()){
+		if(rs.next()){
                         int id=rs.getInt(1);
                         String category=rs.getString(2);
                         String question=rs.getString(3);
 			String higher=rs.getString(4);
+			String source=rs.getString(5);
+
 			//Add the suburbs to the XML file
            		Element q = doc.createElement("question");
             		q.setAttribute("category",category);
@@ -91,7 +93,23 @@ public class Answer {
 			q.appendChild(doc.createTextNode(question));
             		root.appendChild(q);
 
+
+			PreparedStatement st2=c.prepareStatement("select * from "+source+" where postcode in (?,?);");
+                	st2.setInt(1,postcode1);
+			st2.setInt(2,postcode2);
+                	ResultSet rs2=st2.executeQuery();
+			while (rs2.next()){
+				int pcr=rs2.getInt(1);
+				int val=rs2.getInt(2);
+				Element pc = doc.createElement("postcode");
+                     		pc.setAttribute("postcode",Integer.toString(pcr));
+                     		pc.setAttribute("val",Integer.toString(val));
+				root.appendChild(pc);
+			}
                 }
+		else{
+		}
+
 
 			// Convert the XML file back into a string.. 
 
