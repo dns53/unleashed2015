@@ -14,9 +14,9 @@ import javax.naming.NamingException;
 
 import java.sql.Connection;
 import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
-
 import java.io.*;
 
 import org.w3c.dom.*;
@@ -40,26 +40,45 @@ public class SuburbsByState {
     @GET
     @Produces(MediaType.TEXT_XML)
 //    @Produces(MediaType.TEXT_PLAIN)
-    public String getSuburbs(
+    public String getSuburbsByState(
 		@DefaultValue("SA") @QueryParam("state") String requestedState) throws Exception{
+		
+		int postcodeMin = 5000;
+		int postcodeMax = 5999;
 
-		 // This section connects to the database and executes the query
-		 Context context = new InitialContext();
+		// This section connects to the database and executes the query
+		Context context = new InitialContext();
                 Context envCtx = (Context) context.lookup("java:comp/env");
                 DataSource   ds =  (DataSource)envCtx.lookup("jdbc/govhack");
                 Connection c=ds.getConnection();
-                Statement st=c.createStatement();
 		
 		String query = "select suburb,postcode from suburbs";
+/*
+		// Run a query to get the postcode range for that state
+		String stateQuery = "select state,postcodeMin,postcodeMax from states where state = ? ;";
+		Statement st2=c.prepareStatement(stateQuery);
+		st2.setString(1,requestedState);
+		ResultSet rs2=st2.executeQuery(stateQuery);
+		
+		// TODO Add code in here to grab the postcode Min, and Max as variables
 
-		if (requestedState){
-			query += " where postcode = "+Integer.toString(requestedPostcode)+" ;";
-		}
+		rs2.close();
+		st2.close();
+*/
 
 		// Here's where the data is returned
+		// Then use the returned range to refine the query
+		// This part is added down here for clarity when inserting the arguments
+		query += " where postcode in ( ?,?) ;";
+		
+                PreparedStatement st=c.prepareStatement(query);
+		st.setInt(1, postcodeMin);
+		st.setInt(2, postcodeMax);
                 ResultSet rs=st.executeQuery(query);
 
+		// This function assumes the standard format for a query on the Suburbs table
 		String result = suburbsToXML(rs);
+
                 rs.close();
                 st.close();
 
@@ -85,18 +104,18 @@ public class SuburbsByState {
 		Element wrapper = doc.createElement("suburbs");
 		root.appendChild(wrapper);
 
-	while(rs.next()){
-		String name=rs.getString(1);
-		String postcode=rs.getString(2);
-		Suburb tempSuburb = new Suburb(name, postcode);
+		while(rs.next()){
+			String name=rs.getString(1);
+			String postcode=rs.getString(2);
+			Suburb tempSuburb = new Suburb(name, postcode);
 
-		//Add the suburbs to the XML file
-		Element suburb = doc.createElement("suburb");
-		suburb.setAttribute("name", name);
-		suburb.setAttribute("postcode", postcode);
-		wrapper.appendChild(suburb);
+			//Add the suburbs to the XML file
+			Element suburb = doc.createElement("suburb");
+			suburb.setAttribute("name", name);
+			suburb.setAttribute("postcode", postcode);
+			wrapper.appendChild(suburb);
 
-	}
+		}
 
 		// Convert the XML file back into a string.. 
 
