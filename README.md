@@ -21,10 +21,10 @@ There is no guarantee that this will remain available at the same location beyon
 
 Endpoint|Description|
 --------|-----------
-[getsuburbs?postcode=<postcode>](http://phaze.space/simple-service-webapp/webapi/getsuburbs)|Retrieve list of available suburbs for a particular post code
-[getsuburbsbystate?state=<state>](http://phaze.space/simple-service-webapp/webapi/getsuburbsbystate)|Retrieve list of available suburbs and postcodes for a particular state
+[getsuburbs?postcode=5095](http://phaze.space/simple-service-webapp/webapi/getsuburbs)|Retrieve list of available suburbs for a particular post code
+[getsuburbsbystate?state=SA](http://phaze.space/simple-service-webapp/webapi/getsuburbsbystate)|Retrieve list of available suburbs and postcodes for a particular state
 [question](http://phaze.space/simple-service-webapp/webapi/question)|Retrieve a list of questions of useful information that may be retrieved from the database
-[answer?id=<question>&postcode1=<postcode1>&postcode2=<postcode2>](http://phaze.space/simple-service-webapp/webapi/answer)|Given a postcode and a view key of one specific one question, retrieve a score. The game will call this twice, and compare the result.
+[answer?id=1&postcode1=5554&postcode2=5555](http://phaze.space/simple-service-webapp/webapi/answer)|Given a postcode and a view key of one specific one question, retrieve a score. The game will call this twice, and compare the result.
 
 ### API : question
 
@@ -36,8 +36,6 @@ FIXME
 '''
 
 ### API : answer
-
-Note how the question returns a field 'x'.
 
 Example query:
 
