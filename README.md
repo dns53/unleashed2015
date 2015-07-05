@@ -75,5 +75,8 @@ And we did some early system engineering to ensure our concept made sense!
 ![architecture](images/whiteboard.jpg)
 
 A very early mock up of the game
-![mockup](images/early.jpg)
+![whiteboard mockup](images/early.jpg)
+
+More mockups
+![mockup](images/mockup.jpg)
 
