@@ -1,8 +1,8 @@
 package phase.space;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
+//import javax.ws.rs.Path;
+//import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -28,10 +28,7 @@ import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
 
 
-/**
- * Root resource (exposed at "myresource" path)
- */
-@Path("myresource")
+@Path("getsuburbs")
 public class MyResource {
 
     /**
@@ -41,72 +38,87 @@ public class MyResource {
      * @return String that will be returned as a text/plain response.
      */
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getIt() throws Exception{
+    @Produces(MediaType.TEXT_XML)
+//    @Produces(MediaType.TEXT_PLAIN)
+    public String getSuburbs(
+		@DefaultValue("5011") @QueryParam("postcode") int requestedPostcode) throws Exception{
 
-	 // This section connects to the database and executes the query
-         Context context = new InitialContext();
+		 // This section connects to the database and executes the query
+		 Context context = new InitialContext();
                 Context envCtx = (Context) context.lookup("java:comp/env");
                 DataSource   ds =  (DataSource)envCtx.lookup("jdbc/govhack");
                 Connection c=ds.getConnection();
                 Statement st=c.createStatement();
+		
+		String query = "select suburb,postcode from suburbs";
+
+		if (requestedPostcode > 0){
+			query += " where postcode = "+Integer.toString(requestedPostcode)+" ;";
+		}
 
 		// Here's where the data is returned
-                ResultSet rs=st.executeQuery("select suburb,postcode from suburbs;");
- 
-		String res=new String();
+                ResultSet rs=st.executeQuery(query);
 
-
-		//Creating an empty XML Document
-            	DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-            	DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-            	Document doc = docBuilder.newDocument();		
-
-		Element root = doc.createElement("root");
-		doc.appendChild(root);
-
-		//Quick and dirty: add XML header
-		//res="<?xml version=\"1.0\" standalone='yes'?>\n\n";
-                
-		while(rs.next()){
-                        String name=rs.getString(1);
-                        String postcode=rs.getString(2);
-			Suburb tempSuburb = new Suburb(name, postcode);
-
-			//Add the suburbs to the XML file
-           		Element suburb = doc.createElement("suburb");
-            		suburb.setAttribute("name", name);
-            		suburb.setAttribute("postcode", postcode);
-            		root.appendChild(suburb);
-
-
-			// Convert the XML file back into a string.. 
-
-            		//set up a transformer
-            		TransformerFactory transfac = TransformerFactory.newInstance();
-           		Transformer trans = transfac.newTransformer();
-            		trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            		trans.setOutputProperty(OutputKeys.INDENT, "yes");
-
-            		//create string from xml tree
-            		StringWriter sw = new StringWriter();
-            		StreamResult result = new StreamResult(sw);
-            		DOMSource source = new DOMSource(doc);
-            		trans.transform(source, result);
-            		res = sw.toString();
-
-			//res=res+"<suburb>\n";
-			//res=res+"\t<name>"+tempSuburb.name+"</name>\n";
-			//res=res+"\t<postcode>"+tempSuburb.postcode+"</postcode>\n";
-			//res=res+"</suburb>\n";
-			//'res' is a string. Should be using Append? 
-			// syntax below is wrong
-			//res.append(tempSuburb.name);
-                }
-
+		String result = suburbsToXML(rs);
                 rs.close();
                 st.close();
 
-       return res;
+
+	//return query;
+       return result;
     }
+
+    protected String suburbsToXML(ResultSet rs){
+
+	String res = "";	
+	//Creating an empty XML Document
+	try {
+		DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+		DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+		Document doc = docBuilder.newDocument();		
+
+		Element root = doc.createElement("xml");
+		root.setAttribute("version", "1.0");
+		root.setAttribute("encoding", "UTF-8");
+		doc.appendChild(root);
+		
+		Element wrapper = doc.createElement("suburbs");
+		root.appendChild(wrapper);
+
+	while(rs.next()){
+		String name=rs.getString(1);
+		String postcode=rs.getString(2);
+		Suburb tempSuburb = new Suburb(name, postcode);
+
+		//Add the suburbs to the XML file
+		Element suburb = doc.createElement("suburb");
+		suburb.setAttribute("name", name);
+		suburb.setAttribute("postcode", postcode);
+		wrapper.appendChild(suburb);
+
+	}
+
+		// Convert the XML file back into a string.. 
+
+		//set up a transformer
+		TransformerFactory transfac = TransformerFactory.newInstance();
+		Transformer trans = transfac.newTransformer();
+		trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+		trans.setOutputProperty(OutputKeys.INDENT, "yes");
+
+		//create string from xml tree
+		StringWriter sw = new StringWriter();
+		StreamResult result = new StreamResult(sw);
+		DOMSource source = new DOMSource(doc);
+		trans.transform(source, result);
+		res = sw.toString();
+
+	} catch (Exception e) {
+		res = "Error creating XML doc";
+		res = res + e.getMessage();
+	}
+
+
+	return res;
+    } 
 }
