@@ -115,6 +115,7 @@ public class Question {
 
                 rs.close();
                 st.close();
+		c.close();
 
        return res;
     }

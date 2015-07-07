@@ -62,6 +62,7 @@ public class MyResource {
 		String result = suburbsToXML(rs);
                 rs.close();
                 st.close();
+		c.close();
 
 
 	//return query;

@@ -62,6 +62,7 @@ public class SuburbsByState {
 
                 rs.close();
                 st.close();
+		c.close();
 
 
 	//return query;
