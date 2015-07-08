@@ -1,0 +1,1 @@
+﻿package  {		public class Bout {		public function Bout() {			// constructor code		}	}	}
