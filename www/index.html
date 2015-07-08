@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>D3.xml Example</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
+   <style type="text/css">
+.chart div {
+   font: 10px sans-serif;
+   background-color: steelblue;
+   text-align: right;
+   padding: 3px;
+   margin: 1px;
+   color: white;
+ }
+    </style>
+</head>
+<body>
+<div id="setup">
+<div><select id="suburb1"></select><div id="postcode1"></div></div>
+<div><select id="suburb2"></select><div id="postcode2"></div></div>
+<button id="fight" disabled="disabled">Fight</button>
+</div>
+
+<script>
+var postcode1=5000;
+var postcode2=5000;
+d3.xml("http://phaze.space/simple-service-webapp/webapi/getsuburbsbystate", "application/xml", function(xml) {
+var select = d3.select("#suburb1")
+    select
+      .on("change", function(d) {
+        postcode1 = d3.select(this).property("value");
+        d3.select("#postcode1").text(postcode1);
+	checkPostcodes();
+      });
+
+
+select.selectAll("option")
+.data(xml.documentElement.getElementsByTagName("suburb"))
+  .enter()
+     .append("option").attr("value",function(d) {return d.getAttribute("name")})
+     .text(function(d) { return d.getAttribute("postcode") });
+
+var select2 = d3.select("#suburb2")
+    select2
+      .on("change", function(d) {
+        postcode2 = d3.select(this).property("value");
+        d3.select("#postcode2").text(postcode2);
+	checkPostcodes();
+      });
+
+
+select2.selectAll("option")
+.data(xml.documentElement.getElementsByTagName("suburb"))
+  .enter()
+     .append("option").attr("value",function(d) {return d.getAttribute("name")})
+     .text(function(d) { return d.getAttribute("postcode") });
+
+});
+
+function checkPostcodes(){
+	if (postcode1 != postcode2){
+		d3.select("#fight").attr("disabled",null)
+		d3.select("#fight").attr("onclick","foo()")
+	}
+}
+function foo(){
+alert("fight");
+}
+</script>
+</body>
+</html>
